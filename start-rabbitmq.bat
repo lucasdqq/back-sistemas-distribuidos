@@ -1,0 +1,3 @@
+@echo off
+echo Iniciando RabbitMQ com Docker Compose...
+docker-compose up -d
