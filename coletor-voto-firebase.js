@@ -2,10 +2,9 @@ const amqp = require('amqplib');
 const admin = require('firebase-admin');
 const fs = require('fs');
 
-// 🔐 Caminho da chave privada baixada do Firebase
 const serviceAccount = require('./firebase-config.json');
 
-// 🛠️ Inicializa o Firebase
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -25,13 +24,13 @@ async function enviarVoto(voto, grupo = "grupoX") {
     datetime: new Date().toISOString()
   };
 
-  // 🔁 Envia para RabbitMQ
+  // envio rabbit
   channel.sendToQueue(queue, Buffer.from(JSON.stringify(mensagem)), {
     persistent: true
   });
   console.log("✅ Voto enviado para fila RabbitMQ");
 
-  // 💾 Salva no Firestore
+  // salva copia no banco
   await db.collection('votos').add(mensagem);
   console.log("✅ Voto salvo no Firebase Firestore");
 
@@ -41,7 +40,6 @@ async function enviarVoto(voto, grupo = "grupoX") {
   }, 500);
 }
 
-// ⚙️ Captura argumento
 const args = process.argv.slice(2);
 const voto = parseInt(args[0]);
 if (![1, 2].includes(voto)) {
