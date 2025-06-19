@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -10,3 +18,15 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+
+  backend:
+    build: .
+    container_name: backend-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    volumes:
+      - .:/app
+    command: ["node", "app.js"]
