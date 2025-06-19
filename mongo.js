@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 
 async function connectMongo() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/votacao", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect("mongodb://mongodb:27017/votacao");
     console.log("✅ Conectado ao MongoDB");
   } catch (error) {
     console.error("❌ Erro ao conectar ao MongoDB:", error);

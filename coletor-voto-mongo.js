@@ -1,37 +1,44 @@
 const amqp = require("amqplib");
 const connectMongo = require("./mongo");
-const Voto = require("./voto.model");
+const mongoose = require("mongoose");
 
-const voto = parseInt(process.argv[2], 10) || 1;
+const votoSchema = new mongoose.Schema({
+  type: String,
+  objectIdentifier: String,
+  valor: Number,
+  datetime: Number
+});
+
+const Voto = mongoose.model("Voto", votoSchema);
+
+const votoValor = parseInt(process.argv[2], 10) || 1;
 
 async function enviarVoto() {
   await connectMongo();
 
-  const novoVoto = new Voto({
+  const votoData = {
     type: "voto",
-    object: "grupoX",
-    valor: voto,
-    datetime: new Date()
-  });
+    objectIdentifier: "grupoX",
+    valor: votoValor,
+    datetime: Date.now()
+  };
 
-  try {
-    await novoVoto.save();
-    console.log("✅ Voto salvo no MongoDB");
-  } catch (err) {
-    console.error("❌ Erro ao salvar no Mongo:", err);
-  }
+  const novoVoto = new Voto(votoData);
+  await novoVoto.save();
 
-  const connection = await amqp.connect("amqp://localhost");
+  const connection = await amqp.connect("amqp://rabbitmq:5672");
   const channel = await connection.createChannel();
-  const queue = "core.votos";
+  const queue = "lotes_de_dados";
   await channel.assertQueue(queue, { durable: false });
 
-  const mensagem = JSON.stringify(novoVoto.toObject());
+  const mensagem = JSON.stringify(votoData);
   channel.sendToQueue(queue, Buffer.from(mensagem));
 
-  console.log("✅ Voto enviado para RabbitMQ");
+  console.log("✅ Voto enviado para fila:", queue);
+
   await channel.close();
   await connection.close();
+  await mongoose.disconnect();
+  process.exit(0);  
 }
-
 enviarVoto();
