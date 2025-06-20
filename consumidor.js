@@ -1,23 +1,37 @@
-const amqp = require('amqplib');
-const { processarLote } = require('./app/services/loteService');
+const amqp = require("amqplib");
+const connectMongo = require("./mongo");
+const mongoose = require("mongoose");
 
-async function startConsumer() {
-  const conn = await amqp.connect('amqp://localhost');
-  const channel = await conn.createChannel();
-  const queue = 'lotes';
+const votoSchema = new mongoose.Schema({
+  type: String,
+  objectIdentifier: String,
+  valor: Number,
+  datetime: Number
+});
 
-  await channel.assertQueue(queue, { durable: true });
+const Voto = mongoose.model("Voto", votoSchema);
 
-  console.log('👂 Aguardando mensagens da fila:', queue);
+async function start() {
+  await connectMongo();
+  const connection = await amqp.connect("amqp://rabbitmq:5672");
+  const channel = await connection.createChannel();
+  const queue = "lotes_de_dados";
+
+  await channel.assertQueue(queue, { durable: false });
+  console.log("🎧 Aguardando mensagens na fila:", queue);
+
   channel.consume(queue, async (msg) => {
     if (msg !== null) {
       const dados = JSON.parse(msg.content.toString());
-      console.log('📥 Lote recebido da fila:', dados);
-      const sucesso = await processarLote(dados);
-      if (sucesso) channel.ack(msg);
-      else channel.nack(msg, false, false); // rejeita duplicata
+      console.log("📥 Mensagem recebida:", dados);
+      try {
+        await new Voto(dados).save();
+        console.log("✅ Salvo no MongoDB");
+      } catch (err) {
+        console.error("❌ Erro ao salvar no Mongo:", err.message);
+      }
+      channel.ack(msg);
     }
   });
 }
-
-startConsumer().catch(console.error);
+start();
