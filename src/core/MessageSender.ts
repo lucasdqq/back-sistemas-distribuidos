@@ -1,5 +1,5 @@
 import * as amqp from "amqplib";
-import { config } from "../config/app.config";
+import { AppConfig } from "../config/app.config";
 import { PayloadCore } from "../types/message.types";
 
 export class MessageSender {
@@ -8,20 +8,20 @@ export class MessageSender {
   private readonly queue: string;
 
   constructor() {
-    this.queue = config.core.queue;
+    this.queue = AppConfig.core.queue;
   }
 
   async connect(): Promise<void> {
     try {
-      const url = `amqps://${config.rabbitmq.username}:${config.rabbitmq.password}@${config.rabbitmq.host}:${config.rabbitmq.port}/${config.rabbitmq.virtualHost}`;
+      const url = `amqps://${AppConfig.rabbitmq.username}:${AppConfig.rabbitmq.password}@${AppConfig.rabbitmq.host}:${AppConfig.rabbitmq.port}/${AppConfig.rabbitmq.virtualHost}`;
 
       this.connection = await amqp.connect(url);
       this.channel = await this.connection.createChannel();
 
       await this.channel.assertQueue(this.queue, { durable: true });
-      console.log("✅ Conectado ao RabbitMQ");
+      console.log("Conectado ao RabbitMQ");
     } catch (error) {
-      console.error("❌ Erro ao conectar ao RabbitMQ:", error);
+      console.error("Erro ao conectar ao RabbitMQ:", error);
       throw error;
     }
   }
@@ -34,9 +34,9 @@ export class MessageSender {
 
       const messageBuffer = Buffer.from(JSON.stringify(message));
       this.channel!.sendToQueue(this.queue, messageBuffer);
-      console.log("📤 Mensagem enviada com sucesso");
+      console.log("Mensagem enviada com sucesso");
     } catch (error) {
-      console.error("❌ Falha ao enviar mensagem:", error);
+      console.error("Falha ao enviar mensagem:", error);
       throw error;
     }
   }
@@ -49,9 +49,9 @@ export class MessageSender {
       if (this.connection) {
         await this.connection.close();
       }
-      console.log("🔌 Desconectado do RabbitMQ");
+      console.log("Desconectado do RabbitMQ");
     } catch (error) {
-      console.error("❌ Erro ao desconectar do RabbitMQ:", error);
+      console.error("Erro ao desconectar do RabbitMQ:", error);
     }
   }
 }

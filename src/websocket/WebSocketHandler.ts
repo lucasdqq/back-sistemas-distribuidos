@@ -13,33 +13,33 @@ export class WebSocketHandler {
 
   private setupWebSocket(): void {
     this.wss.on("connection", (ws: WebSocket, request: IncomingMessage) => {
-      console.log("🟢 Cliente WebSocket conectado");
+      console.log("Conectou no websocket");
       this.sessions.add(ws);
 
       ws.on("message", (data: Buffer) => {
         try {
           const message = JSON.parse(data.toString());
-          console.log("📨 Mensagem recebida via WebSocket:", message);
+          console.log("Mensagem recebida via WebSocket:", message);
 
           // Retransmite para todos os clientes conectados
           this.broadcastMessage(data.toString());
         } catch (error) {
-          console.error("❌ Erro ao processar mensagem WebSocket:", error);
+          console.error("Erro ao processar mensagem WebSocket:", error);
         }
       });
 
       ws.on("close", () => {
-        console.log("🔴 Cliente WebSocket desconectado");
+        console.log("Cliente WebSocket desconectado");
         this.sessions.delete(ws);
       });
 
       ws.on("error", (error) => {
-        console.error("❌ Erro no WebSocket:", error);
+        console.error("Erro no WebSocket:", error);
         this.sessions.delete(ws);
       });
     });
 
-    console.log("🚀 WebSocket Server iniciado");
+    console.log("WebSocket Server iniciado");
   }
 
   public broadcastMessage(message: string): void {
@@ -48,7 +48,7 @@ export class WebSocketHandler {
         try {
           session.send(message);
         } catch (error) {
-          console.error("❌ Erro ao enviar mensagem via WebSocket:", error);
+          console.error("Erro ao enviar mensagem via WebSocket:", error);
           this.sessions.delete(session);
         }
       } else {
@@ -64,6 +64,6 @@ export class WebSocketHandler {
 
   public close(): void {
     this.wss.close();
-    console.log("🔌 WebSocket Server fechado");
+    console.log("WebSocket Server fechado");
   }
 }

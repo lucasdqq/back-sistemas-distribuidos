@@ -61,7 +61,7 @@ export class MessageReceiver {
       }
     });
 
-    console.log("👂 MessageReceiver escutando na fila:", this.responseQueue);
+    console.log("MessageReceiver escutando na fila:", this.responseQueue);
   }
 
   async disconnect(): Promise<void> {
