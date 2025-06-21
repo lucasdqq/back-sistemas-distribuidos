@@ -94,7 +94,8 @@ class App {
           }
         });
       } catch (error) {
-        console.error("Erro ao buscar resultados agregados:", error.message);
+        if (error instanceof Error)
+          console.error("Erro ao buscar resultados agregados:", error.message);
       }
 
       this.server.listen(AppConfig.server.port, () => {

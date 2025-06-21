@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { MessageSender } from "../core/MessageSender";
 import { Message, PayloadCore, VotoRequest } from "../types/message.types";
+import { DadoAgregadoModel } from "../model/DadoAgregado.model";
 
 export class MessageController {
   private readonly sender: MessageSender;
@@ -42,6 +43,24 @@ export class MessageController {
         success: false,
         message: "Erro interno do servidor",
         error: error instanceof Error ? error.message : "Erro desconhecido",
+      });
+    }
+  }
+
+  async buscarVotos(req: Request, res: Response): Promise<void> {
+    try {
+      const votos = await DadoAgregadoModel.find().lean();
+
+      res.status(200).json({
+        success: true,
+        dadosAgregados: votos,
+      });
+    } catch (e) {
+      console.error("Erro ao buscar votos:", e);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao buscar dados agregados",
+        error: e instanceof Error ? e.message : "Erro desconhecido",
       });
     }
   }

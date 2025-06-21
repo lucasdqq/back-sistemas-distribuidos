@@ -10,6 +10,7 @@ export function createVotacaoRoutes(): Router {
   router.get("/", (req, res) => controller.healthCheck(req, res));
 
   router.post("/candidato/:id", (req, res) => controller.votar(req, res));
+  router.get("/votos", (req, res) => controller.buscarVotos(req, res));
 
   return router;
 }
