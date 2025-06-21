@@ -33,8 +33,10 @@ export class MessageSender {
       }
 
       const messageBuffer = Buffer.from(JSON.stringify(message));
+
       this.channel!.sendToQueue(this.queue, messageBuffer);
-      console.log("Mensagem enviada com sucesso");
+      console.log("Mensagem enviada com sucesso para o no-agregador");
+      console.log(message);
     } catch (error) {
       console.error("Falha ao enviar mensagem:", error);
       throw error;

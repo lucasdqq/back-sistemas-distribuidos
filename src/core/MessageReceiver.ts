@@ -44,10 +44,13 @@ export class MessageReceiver {
           const content = JSON.parse(
             msg.content.toString()
           ) as PayloadAgregadoCore;
-          console.log("Resposta recebida do no-agregadir:", content);
+          console.log(
+            "Resposta recebida do no-agregadir:",
+            JSON.stringify(content)
+          );
 
           this.webSocketHandler.broadcastMessage(JSON.stringify(content));
-
+          console.log("enviou mensagem");
           // Confirma o processamento da mensagem
           if (this.channel) {
             this.channel.ack(msg);
