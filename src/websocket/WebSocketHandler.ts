@@ -1,6 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws";
 import { IncomingMessage } from "http";
-import { URL } from "url";
 
 export class WebSocketHandler {
   private wss: WebSocketServer;

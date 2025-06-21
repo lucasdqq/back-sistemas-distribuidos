@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
+import bodyParser, { json } from "body-parser";
 import { createServer } from "http";
 import { AppConfig } from "./config/app.config";
 import { createVotacaoRoutes } from "./routes/votacao.routes";
 import { WebSocketHandler } from "./websocket/WebSocketHandler";
 import { MessageReceiver } from "./core/MessageReceiver";
 import { MessageSender } from "./core/MessageSender";
+import axios from "axios";
+import { DadosAgregados } from "./types/message.types";
 
 class App {
   private app: express.Application;
@@ -62,6 +64,21 @@ class App {
       // Conecta no RabbitMQ
       await this.messageSender.connect();
       await this.messageReceiver.connect();
+
+      try {
+        const response = await axios.get(
+          "https://agregador-node.onrender.com/api/aggregator/results"
+        );
+        console.log(
+          "Resultados agregados recebidos na inicialização:",
+          response.data
+        );
+        const data: DadosAgregados[] = response.data;
+        console.log("-------");
+        console.log(JSON.stringify(data));
+      } catch (error) {
+        console.error("Erro ao buscar resultados agregados:", error.message);
+      }
 
       this.server.listen(AppConfig.server.port, () => {
         console.log(`Servidor rodando na porta ${AppConfig.server.port}`);
