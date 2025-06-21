@@ -53,7 +53,7 @@ class App {
   }
 
   private setupRoutes(): void {
-    this.app.use("/api/votar", createVotacaoRoutes());
+    this.app.use("/api/votar", createVotacaoRoutes(this.webSocketHandler));
 
     // Rota de teste geral
     this.app.get("/", (req, res) => {
