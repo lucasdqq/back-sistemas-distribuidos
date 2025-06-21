@@ -1,5 +1,5 @@
 import * as amqp from "amqplib";
-import { config } from "../config/app.config";
+import { AppConfig } from "../config/app.config";
 import { PayloadCore } from "../types/message.types";
 import { WebSocketHandler } from "../websocket/WebSocketHandler";
 
@@ -15,26 +15,26 @@ export class MessageReceiver {
 
   async connect(): Promise<void> {
     try {
-      const url = `amqps://${config.rabbitmq.username}:${config.rabbitmq.password}@${config.rabbitmq.host}:${config.rabbitmq.port}/${config.rabbitmq.virtualHost}`;
+      const url = `amqps://${AppConfig.rabbitmq.username}:${AppConfig.rabbitmq.password}@${AppConfig.rabbitmq.host}:${AppConfig.rabbitmq.port}/${AppConfig.rabbitmq.virtualHost}`;
 
       this.connection = await amqp.connect(url);
       this.channel = await this.connection.createChannel();
 
       if (this.channel) {
         await this.channel.assertQueue(this.responseQueue, { durable: true });
-        console.log("✅ MessageReceiver conectado ao RabbitMQ");
+        console.log("conectado ao RabbitMQ");
 
         this.startListening();
       }
     } catch (error) {
-      console.error("❌ Erro ao conectar MessageReceiver ao RabbitMQ:", error);
+      console.error("Erro ao conectar MessageReceiver ao RabbitMQ:", error);
       throw error;
     }
   }
 
   private startListening(): void {
     if (!this.channel) {
-      console.error("❌ Canal não disponível para escutar mensagens");
+      console.error("Canal não disponível para escutar mensagens");
       return;
     }
 
@@ -42,7 +42,7 @@ export class MessageReceiver {
       if (msg) {
         try {
           const content = JSON.parse(msg.content.toString()) as PayloadCore;
-          console.log("📥 Resposta recebida do core:", content);
+          console.log("Resposta recebida do core:", content);
 
           // Envia para todos os clientes WebSocket
           this.webSocketHandler.broadcastMessage(JSON.stringify(content));
@@ -52,7 +52,7 @@ export class MessageReceiver {
             this.channel.ack(msg);
           }
         } catch (error) {
-          console.error("❌ Erro ao processar mensagem:", error);
+          console.error("Erro ao processar mensagem:", error);
           // Rejeita a mensagem em caso de erro
           if (this.channel) {
             this.channel.nack(msg);
@@ -74,10 +74,7 @@ export class MessageReceiver {
       }
       console.log("🔌 MessageReceiver desconectado do RabbitMQ");
     } catch (error) {
-      console.error(
-        "❌ Erro ao desconectar MessageReceiver do RabbitMQ:",
-        error
-      );
+      console.error("Erro ao desconectar MessageReceiver do RabbitMQ:", error);
     }
   }
 }
