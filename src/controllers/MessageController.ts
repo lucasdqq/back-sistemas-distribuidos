@@ -12,7 +12,6 @@ export class MessageController {
 
   async votar(req: Request, res: Response): Promise<void> {
     try {
-      const idCandidato = req.params.id;
       const body: VotoRequest = req.body;
 
       console.log("Voto recebido");
