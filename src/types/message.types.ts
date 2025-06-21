@@ -12,8 +12,5 @@ export interface PayloadCore {
 }
 
 export interface VotoRequest {
-  type: string;
   objectIdentifier: string;
-  valor: number;
-  datetime: string;
 }

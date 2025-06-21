@@ -15,24 +15,21 @@ export class MessageController {
       const idCandidato = req.params.id;
       const body: VotoRequest = req.body;
 
-      console.log("🗳️ Voto recebido para candidato:", idCandidato);
+      console.log("Voto recebido");
 
-      // Cria a mensagem no formato esperado
       const message: Message = {
-        type: body.type,
-        objectIdentifier: idCandidato,
-        valor: body.valor,
-        datetime: body.datetime || new Date().toISOString(),
+        type: "melhor-filme-2025",
+        objectIdentifier: body.objectIdentifier,
+        valor: 1,
+        datetime: new Date().toISOString(),
       };
 
-      // Cria o payload no formato do core
       const payloadCore: PayloadCore = {
         batchId: uuidv4(),
         sourceNodeId: "node-coletor-fantasma",
         dataPoints: [message],
       };
 
-      // Envia a mensagem
       await this.sender.sendMessage(payloadCore);
 
       res.status(200).json({
@@ -41,7 +38,7 @@ export class MessageController {
         batchId: payloadCore.batchId,
       });
     } catch (error) {
-      console.error("❌ Erro ao processar voto:", error);
+      console.error("Erro ao processar voto:", error);
       res.status(500).json({
         success: false,
         message: "Erro interno do servidor",
