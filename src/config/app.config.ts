@@ -15,4 +15,7 @@ export const AppConfig = {
   core: {
     queue: "lotes_de_dados",
   },
+  mongodb: {
+    uri: "mongodb://localhost:27017/agregador_db",
+  },
 };
