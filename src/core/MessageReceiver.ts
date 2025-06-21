@@ -1,6 +1,6 @@
 import * as amqp from "amqplib";
 import { AppConfig } from "../config/app.config";
-import { PayloadCore } from "../types/message.types";
+import { PayloadAgregadoCore, PayloadCore } from "../types/message.types";
 import { WebSocketHandler } from "../websocket/WebSocketHandler";
 
 export class MessageReceiver {
@@ -41,10 +41,11 @@ export class MessageReceiver {
     this.channel.consume(this.responseQueue, (msg) => {
       if (msg) {
         try {
-          const content = JSON.parse(msg.content.toString()) as PayloadCore;
-          console.log("Resposta recebida do core:", content);
+          const content = JSON.parse(
+            msg.content.toString()
+          ) as PayloadAgregadoCore;
+          console.log("Resposta recebida do no-agregadir:", content);
 
-          // Envia para todos os clientes WebSocket
           this.webSocketHandler.broadcastMessage(JSON.stringify(content));
 
           // Confirma o processamento da mensagem

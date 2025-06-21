@@ -32,3 +32,9 @@ export interface Item {
   contagem: number;
   porcentagem: number;
 }
+
+export interface PayloadAgregadoCore {
+  batchId: string;
+  sourceNodeId: string;
+  dadosAgregados: DadoAgregado[];
+}
