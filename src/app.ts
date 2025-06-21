@@ -9,6 +9,8 @@ import { MessageReceiver } from "./core/MessageReceiver";
 import { MessageSender } from "./core/MessageSender";
 import axios from "axios";
 import { DadosAgregados } from "./types/message.types";
+import mongoose from "mongoose";
+import { DadoAgregadoModel } from "./model/DadoAgregado.model";
 
 class App {
   private app: express.Application;
@@ -64,6 +66,8 @@ class App {
       // Conecta no RabbitMQ
       await this.messageSender.connect();
       await this.messageReceiver.connect();
+      await mongoose.connect(AppConfig.mongodb.uri);
+      console.log("Conectado ao MongoDB");
 
       try {
         const response = await axios.get(
@@ -73,9 +77,22 @@ class App {
           "Resultados agregados recebidos na inicialização:",
           response.data
         );
-        const data: DadosAgregados[] = response.data;
+        const data: DadosAgregados = response.data;
         console.log("-------");
         console.log(JSON.stringify(data));
+
+        data.dadosAgregados.forEach(async (it) => {
+          try {
+            await DadoAgregadoModel.findOneAndUpdate(
+              { type: it.type },
+              { $set: { lista: it.lista } },
+              { upsert: true, new: true }
+            );
+            console.log("salvou");
+          } catch (e) {
+            console.error("erro ao salvar agregados no banco");
+          }
+        });
       } catch (error) {
         console.error("Erro ao buscar resultados agregados:", error.message);
       }
