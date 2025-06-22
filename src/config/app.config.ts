@@ -16,6 +16,7 @@ export const AppConfig = {
     queue: "lotes_de_dados",
   },
   mongodb: {
-    uri: "mongodb://mongo:27017/agregador_db",
+    //uri: "mongodb://mongo:27017/agregador_db",
+    uri: "mongodb://localhost:27017/agregador_db",
   },
 };

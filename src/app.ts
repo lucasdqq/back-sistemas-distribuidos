@@ -11,6 +11,8 @@ import axios from "axios";
 import { DadosAgregados } from "./types/message.types";
 import mongoose from "mongoose";
 import { DadoAgregadoModel } from "./model/DadoAgregado.model";
+import authRoutes from "./routes/auth.routes";
+import { authMiddleware } from "./controllers/AuthController";
 
 class App {
   private app: express.Application;
@@ -53,7 +55,12 @@ class App {
   }
 
   private setupRoutes(): void {
-    this.app.use("/api/votar", createVotacaoRoutes(this.webSocketHandler));
+    this.app.use("/api/auth", authRoutes);
+    this.app.use(
+      "/api/votar",
+      authMiddleware,
+      createVotacaoRoutes(this.webSocketHandler)
+    );
 
     // Rota de teste geral
     this.app.get("/", (req, res) => {
