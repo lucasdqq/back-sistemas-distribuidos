@@ -13,6 +13,7 @@ import mongoose from "mongoose";
 import { DadoAgregadoModel } from "./model/DadoAgregado.model";
 import authRoutes from "./routes/auth.routes";
 import { authMiddleware } from "./controllers/AuthController";
+import { MessageController } from "./controllers/MessageController";
 
 class App {
   private app: express.Application;
@@ -56,6 +57,13 @@ class App {
 
   private setupRoutes(): void {
     this.app.use("/api/auth", authRoutes);
+
+    const sender = new MessageSender();
+    const controller = new MessageController(sender, this.webSocketHandler);
+    this.app.post("/api/votar/update-from-no-agregador", (req, res) =>
+      controller.update(req, res)
+    );
+
     this.app.use(
       "/api/votar",
       authMiddleware,

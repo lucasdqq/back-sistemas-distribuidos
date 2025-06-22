@@ -80,7 +80,7 @@ export class MessageController {
       console.log("Resposta recebida do no-agregadir:", JSON.stringify(body));
 
       this.webSocketHandler.broadcastMessage(JSON.stringify(body));
-      console.log("enviou mensagem");
+      console.log("enviou mensagem para o front");
 
       res.status(200).json({
         success: true,
