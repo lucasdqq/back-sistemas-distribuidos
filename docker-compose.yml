@@ -1,32 +1,14 @@
-version: '3.8'
-
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./data:/data/db
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-
-  backend:
+  app:
     build: .
-    container_name: backend-app
     ports:
-      - "3000:3000"
-    depends_on:
-      - mongodb
-      - rabbitmq
-    volumes:
-      - .:/app
-    command: ["node", "app.js"]
+      - "4012:4012"
+    networks:
+      - app-network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  app-network:
+    driver: bridge
