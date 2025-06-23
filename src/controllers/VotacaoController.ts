@@ -8,8 +8,8 @@ import {
   VotoRequest,
 } from "../types/message.types";
 import { DadoAgregadoModel } from "../model/DadoAgregado.model";
-import { WebSocketHandler } from "@/websocket/WebSocketHandler";
-import { DiscordErrorSender } from "@/DiscordSender";
+import { WebSocketHandler } from "../websocket/WebSocketHandler";
+import { DiscordErrorSender } from "../DiscordSender";
 
 export class VotacaoController {
   private readonly sender: MessageSender;
