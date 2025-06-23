@@ -13,7 +13,8 @@ import mongoose from "mongoose";
 import { DadoAgregadoModel } from "./model/DadoAgregado.model";
 import authRoutes from "./routes/auth.routes";
 import { authMiddleware } from "./controllers/AuthController";
-import { MessageController } from "./controllers/MessageController";
+import { VotacaoController } from "./controllers/VotacaoController";
+import { DiscordErrorSender } from "./DiscordSender";
 
 class App {
   private app: express.Application;
@@ -59,7 +60,7 @@ class App {
     this.app.use("/api/auth", authRoutes);
 
     const sender = new MessageSender();
-    const controller = new MessageController(sender, this.webSocketHandler);
+    const controller = new VotacaoController(sender, this.webSocketHandler);
     this.app.post("/api/votar/update-from-no-agregador", (req, res) =>
       controller.update(req, res)
     );
@@ -82,7 +83,6 @@ class App {
 
   async start(): Promise<void> {
     try {
-      // Conecta no RabbitMQ
       await this.messageSender.connect();
       await this.messageReceiver.connect();
       await mongoose.connect(AppConfig.mongodb.uri);
@@ -110,6 +110,9 @@ class App {
             console.log("salvou");
           } catch (e) {
             console.error("erro ao salvar agregados no banco");
+            await DiscordErrorSender.SendError(
+              "erro ao salvar agregados no banco: " + e
+            );
           }
         });
       } catch (error) {
@@ -129,6 +132,7 @@ class App {
 
       process.on("SIGINT", async () => {
         console.log("\nencerrando backend...");
+
         await this.shutdown();
       });
     } catch (error) {
@@ -142,8 +146,9 @@ class App {
       await this.messageSender.disconnect();
       await this.messageReceiver.disconnect();
       this.webSocketHandler.close();
-      this.server.close(() => {
+      this.server.close(async () => {
         console.log("backend encerrado");
+        await DiscordErrorSender.SendError("Backend foi interrompido");
         process.exit(0);
       });
     } catch (error) {

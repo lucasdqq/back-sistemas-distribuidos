@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { MessageController } from "../controllers/MessageController";
+import { MessageController } from "../controllers/VotacaoController";
 import { MessageSender } from "../core/MessageSender";
 import { WebSocketHandler } from "@/websocket/WebSocketHandler";
 

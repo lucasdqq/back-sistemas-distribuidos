@@ -9,8 +9,9 @@ import {
 } from "../types/message.types";
 import { DadoAgregadoModel } from "../model/DadoAgregado.model";
 import { WebSocketHandler } from "@/websocket/WebSocketHandler";
+import { DiscordErrorSender } from "@/DiscordSender";
 
-export class MessageController {
+export class VotacaoController {
   private readonly sender: MessageSender;
   private readonly webSocketHandler: WebSocketHandler;
 
@@ -47,6 +48,9 @@ export class MessageController {
       });
     } catch (error) {
       console.error("Erro ao processar voto:", error);
+      await DiscordErrorSender.SendError(
+        "recebeu voto mas houve um erro: " + error
+      );
       res.status(500).json({
         success: false,
         message: "Erro interno do servidor",
@@ -64,6 +68,7 @@ export class MessageController {
         dadosAgregados: votos,
       });
     } catch (e) {
+      await DiscordErrorSender.SendError("Erro ao buscar votos: " + e);
       console.error("Erro ao buscar votos:", e);
       res.status(500).json({
         success: false,
@@ -89,6 +94,7 @@ export class MessageController {
       });
     } catch (error) {
       console.error("Erro ao processar voto:", error);
+      await DiscordErrorSender.SendError("Erro ao processar voto: " + error);
       res.status(500).json({
         success: false,
         message: "Erro interno do servidor",
