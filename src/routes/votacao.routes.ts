@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { MessageController } from "../controllers/VotacaoController";
+import { VotacaoController } from "../controllers/VotacaoController";
 import { MessageSender } from "../core/MessageSender";
 import { WebSocketHandler } from "@/websocket/WebSocketHandler";
 
@@ -8,7 +8,7 @@ export function createVotacaoRoutes(
 ): Router {
   const router = Router();
   const sender = new MessageSender();
-  const controller = new MessageController(sender, webSocketHandler);
+  const controller = new VotacaoController(sender, webSocketHandler);
 
   router.get("/", (req, res) => controller.healthCheck(req, res));
 
